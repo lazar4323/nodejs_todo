@@ -20,6 +20,14 @@ app.get('/get_data',(req,res)=>{
     })
 })
 
+app.post('/delete',(req,res)=>{
+    let id = req.body.id;
+    console.log(id);
+    db.todos.remove({'_id':db.ObjectId(id)},(err,data)=>{
+        res.send('Deleted')
+    })
+})
+
 app.listen(3000,()=>{
     console.log('3000')
 })

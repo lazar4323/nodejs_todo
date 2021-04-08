@@ -7,8 +7,8 @@ btn.addEventListener('click',function(){
     let xml = new XMLHttpRequest();
     xml.open('post','/save');
     xml.onreadystatechange = function(){
-        if(xml.readyState == 4 && xml.status == 200){
-            console.log(xml.responseText)
+        if(xml.readyState == 4 && xml.status == 200){    
+            displayTodos();
         }
     }
     xml.setRequestHeader('Content-Type','application/json')
@@ -19,7 +19,7 @@ function displayTodos(){
     let data = new Promise((resolve,reject)=>{
         let xml = new XMLHttpRequest();
         xml.open('get','/get_data');
-        xml.onreadystatechage = ()=>{
+        xml.onreadystatechange = ()=>{
             if(xml.readyState == 4 && xml.status == 200){
                 resolve(JSON.parse(xml.responseText))
             } 
@@ -34,19 +34,36 @@ function displayTodos(){
             <div class="card">
                 <div class="card-header">
                     <button class="btn btn-sm btn-secondary float-left">Todo ${i + 1}</button>
-                    <button class="btn btn-sm btn-success float-right">Sunday 15.05</button>
+                    <button class="btn btn-sm btn-success float-right">${data[i].date}</button>
                 </div>
                 <div class="card-body text-center">
-                    <h3>Uciti MongoDB</h3>
+                    <h3>${data[i].msg}</h3>
                 </div>
-                <div class="card-footer text-center"><button class="btn btn-sm btn-danger">Delete</button></div>
+                <div class="card-footer text-center">
+                    <button data-id="${data[i]._id}" class="btn btn-sm btn-danger">Delete</button>
+                </div>
             </div>
         </div>
             `
         }
         mainRow.innerHTML = text;
+        let allDltBtns = document.querySelectorAll('[data-id]');
+        for(let i = 0; i<allDltBtns.length; i++){
+            allDltBtns[i].addEventListener('click',deleteTodo)
+        }
     })
 }
 
 displayTodos();
 
+function deleteTodo(){
+    let xml = new XMLHttpRequest();
+    xml.open('post','/delete');
+    xml.onreadystatechange = ()=>{
+        if(xml.readyState == 4 && xml.status == 200){
+            displayTodos()
+        }
+    }
+    xml.setRequestHeader("Content-Type",'application/json')
+    xml.send(JSON.stringify({id:this.getAttribute('data-id')}))
+}
